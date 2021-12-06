@@ -1,0 +1,1 @@
+Set-Content -Path 'C:\install-progress.txt' -Value 'starting install'
