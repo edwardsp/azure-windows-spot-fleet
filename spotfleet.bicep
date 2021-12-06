@@ -17,7 +17,7 @@ param adminUsername string
 param adminPassword string
 
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet', 'spotfleet')
-var scriptLocation = 'https://raw.githubusercontent.com/edwardsp/azure-windows-spot-fleet/main/InstallScript.ps1'
+var scriptLocation = 'https://raw.githubusercontent.com/edwardsp/azure-windows-spot-fleet/main'
 
 resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
   name: vmssName
@@ -77,13 +77,14 @@ resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
               publisher: 'Microsoft.Compute'
               settings: {
                 fileUris: [
-                  scriptLocation
+                  '${scriptLocation}/SetScheduledTask.ps1'
+                  '${scriptLocation}/InstallScript.ps1'
                 ]
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File InstallScript.ps1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File SetScheduledTask.ps1'
               }
               type: 'CustomScriptExtension'
             }
