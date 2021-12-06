@@ -26,12 +26,19 @@ resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
     name: 'Standard_HB120rs_v2'
     capacity: instanceCount
   }
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     overprovision: false
     upgradePolicy: {
       mode: 'Manual'
     }
     virtualMachineProfile: {
+      priority: 'Spot'
+      billingProfile: {
+        maxPrice: -1
+      }
       storageProfile: {
         osDisk: {
           createOption: 'FromImage'
