@@ -102,12 +102,11 @@ resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
   }
 }
 
-param roleDefinitionId string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' //Default as contributor role
-resource spotidentity 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(roleDefinitionId, resourceGroup().id)
-
+var roleDefinitionId = 'b24988ac-6180-42a0-ab88-20f7382dd24c' //Default as contributor role
+resource spotidentity 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+  name: guid(vmssName)
+  
   properties: {
-    principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
     principalId: spotfleet.identity.principalId
   }
