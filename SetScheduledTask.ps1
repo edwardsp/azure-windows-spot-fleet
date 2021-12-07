@@ -5,7 +5,7 @@ $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/
 
 mkdir C:\install
 
-kvname=$args[0]
+$kvname = $args[0]
 (Get-Content -Path InstallScript.ps1).replace('__INSERT_KEYVAULT_NAME__', $kvname) | Set-Content -Path C:\install\InstallScript.ps1
 
 $trigger = New-ScheduledTaskTrigger -AtStartup
