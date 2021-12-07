@@ -18,19 +18,28 @@ param adminPassword string
 
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet', 'spotfleet')
 var scriptLocation = 'https://raw.githubusercontent.com/edwardsp/azure-windows-spot-fleet/main'
+//var sku = 'Standard_HB120rs_v2'
+var sku = 'Standard_E32s_v3'
+
+var resourceGroupId = resourceGroup().id
+var identityName = 'id-${uniqueString(resourceGroup().id)}'
+var kvName = 'kv-${uniqueString(resourceGroup().id)}'
 
 resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
   name: vmssName
   location: location
   sku: {
-    name: 'Standard_HB120rs_v2'
+    name: sku
     capacity: instanceCount
   }
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${resourceGroupId}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/${identityName}': {}
+    }
   }
   properties: {
-    overprovision: false
+    overprovision: true
     upgradePolicy: {
       mode: 'Manual'
     }
@@ -91,7 +100,7 @@ resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File SetScheduledTask.ps1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File SetScheduledTask.ps1 ${kvName}'
               }
               type: 'CustomScriptExtension'
             }
@@ -100,18 +109,4 @@ resource spotfleet 'Microsoft.Compute/virtualMachineScaleSets@2021-07-01' = {
       }
     }
   }
-}
-
-var roleDefinitionId = 'b24988ac-6180-42a0-ab88-20f7382dd24c' //Default as contributor role
-resource spotidentity 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(vmssName)
-  
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId)
-    principalId: spotfleet.identity.principalId
-  }
-
-  dependsOn: [
-    spotfleet
-  ]
 }

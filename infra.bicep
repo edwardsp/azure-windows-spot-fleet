@@ -23,4 +23,3 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
     ]
   }
 }
-
