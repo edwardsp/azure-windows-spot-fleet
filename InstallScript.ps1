@@ -2,10 +2,10 @@ function Get-TimeStamp {
     return "[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)
 }
 
+az login -i
+
 $logfile = 'C:\install\install-progress.txt'
-
 $kvname = '__INSERT_KEYVAULT_NAME__'
-
 $secret = (az keyvault secret show --vault-name $kvname --name mysecret | ConvertFrom-Json).value
 
 if (-not(Test-Path -Path $logfile -PathType Leaf)) {
